@@ -11,8 +11,9 @@ from FilePath import *
 import pandas as pd
 import os
 
-# from IsDirectory import isPATH
-# isPATH(labortary_Observation_OUTPUT)
+from IsDirectory import isPATH
+isPATH(labortary_Observation_OUTPUT)
+isPATH(labortary_Specimen_OUTPUT)
 
 
 def observation(labortary_row, labortary_result_row):
