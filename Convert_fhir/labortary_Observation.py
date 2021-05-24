@@ -116,8 +116,6 @@ def specimen(labortary_row, labortary_result_row):
     with open(labortary_Specimen_OUTPUT + "{}.json".format(1), 'w') as outEncounterfile:
         outEncounterfile.write(Specimen.json(Spec))
 
-    pass
-
 
 if __name__ == '__main__':
     with open(labortaryResult_path, newline='') as csv_laboratary:
