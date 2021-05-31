@@ -84,9 +84,11 @@ def observation(labortary_dataframe, count):
         effectivePeriod = Period.construct()
         effectivePeriod.start = datetime.strptime(
             str(int(row.輸入日期)) + str(int(row.輸入時間)).zfill(4), '%Y%m%d%H%M')
-        effectivePeriod.end = datetime.strptime(
-            str(int(row.驗證日期)) + str(int(row.驗證時間)).zfill(4), '%Y%m%d%H%M')
-
+        try:
+            effectivePeriod.end = datetime.strptime(
+                str(int(row.驗證日期)) + str(int(row.驗證時間)).zfill(4), '%Y%m%d%H%M')
+        except:
+            pass
         observ = Observation.construct(status=status, valueQuantity=valueQuantity, valueString=valueString,
                                        code=code, subject=subject, interpretation=interpretations, referenceRange=referenceRange, specimen=specimen,
                                        encounter=encounter, effectiveDateTime=effectiveDateTime, effectivePeriod=effectivePeriod)
