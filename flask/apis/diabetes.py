@@ -1,41 +1,37 @@
-import csv
 import json
 
 import datetime
 from fhirpy import SyncFHIRClient
-from fhirpy.base.exceptions import ResourceNotFound
 from fhirpy.base.searchset import *
+from fhirpy.base.exceptions import ResourceNotFound
 from dateutil.relativedelta import relativedelta
 
 import joblib
 
 CLIENT = SyncFHIRClient('http://192.168.0.125:5555/fhir')
-# TODO: Do it with ASync
-TIME_FORMAT = '%Y-%m-%d'
 
 
-def diabetes(id, table, default_time=None):
+def diabetes_predict(id, table, default_time=None):
     # default_time變數是為模型訓練用(type=date or datetime)，數值放入patient得病的時間，None表示使用現在時間
-    x = list()
     if default_time == None:
         default_time = datetime.datetime.now()
 
     # put all the resource we need in data
     data = dict()
     for key in table:
-        # data[key] = {'resource': resource, 'is_in_component': type(boolean), 'type': 'laboratory' or 'diagnosis'}
         data[key] = dict()
-        # Return dict of resources
         data[key] = get_resources(id, table[key], default_time)
     data['age'] = get_age(id, default_time)
 
     # Put all the values into temp and get ready to predict
+    x = list()
     temp = [6, get_value(data['glucose']), get_value(data['diastolic blood pressure']), 35, get_value(
         data['insulin']), bmi(data['height']['resource'], data['weight']['resource']), 0.627, data['age']]
     loaded_model = joblib.load('finalized_model.sav')
     x.append(temp)
     result_proba = loaded_model.predict_proba(x)
 
+    # Put all the result and datas into result_dict and return as json format
     result_dict = dict()
     # result_proba = [no's probability, yes's probability]
     result_dict['risk_proba'] = result_proba[:, 1][0]
@@ -90,7 +86,7 @@ def get_age(id, default_time):
         patient.birthDate, '%Y-%m-%d')
     # If we need the data that is 1 year before or so, return the real age at the time
     age = default_time - patient_birthdate
-    return int(age.days/365)
+    return int(age.days / 365)
 
 
 def get_value(dictionary):
@@ -143,30 +139,3 @@ def bmi(height_resource, weight_resource):
     }.get(height_resource.valueQuantity.unit, 0)
 
     return weight / height / height
-
-
-if __name__ == '__main__':
-    id = input('id: ')
-    table = {}
-    table_position = "./table/table_example_V2.csv"
-    with open(table_position, newline='') as table_example:
-        rows = csv.DictReader(table_example)
-        for row in rows:
-            if row['model'] not in table:
-                table[row['model']] = {}
-            if row['feature'] not in table[row['model']]:
-                table[row['model']][row['feature']] = {}
-
-            if row['code_system'] != '':
-                code = "{}|{}".format(row['code_system'], row['code'])
-            else:
-                code = row['code']
-            if 'code' in table[row['model']][row['feature']]:
-                # feature裡面已經有code，則覆蓋+新增
-                table[row['model']][row['feature']]['code'] = table[row['model']
-                                                                    ][row['feature']]['code'] + ",{}".format(code)
-            else:
-                table[row['model']][row['feature']]['code'] = code
-            table[row['model']][row['feature']]['type'] = row['type_of_data']
-
-    print(diabetes(id, table['diabetes']))

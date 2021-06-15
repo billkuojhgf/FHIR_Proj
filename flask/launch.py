@@ -1,115 +1,48 @@
+import csv
 import json
-from flask import Flask, render_template
-from fhirpy import SyncFHIRClient
-import datetime
-from fhirpy.base.searchset import *
-import pytz
-import joblib
+from flask import Flask, url_for, redirect, jsonify
+from apis.diabetes import diabetes_predict
 
 app = Flask(__name__)
-client = SyncFHIRClient('http://192.168.0.125:5555/fhir')
+
+# Map the csv into dictionary
+table_position = "./table/table_example.csv"
+table = {}
+with open(table_position, newline='') as table_example:
+    rows = csv.DictReader(table_example)
+    for row in rows:
+        if row['model'] not in table:
+            table[row['model']] = {}
+        if row['feature'] not in table[row['model']]:
+            table[row['model']][row['feature']] = {}
+
+        if row['code_system'] != '':
+            code = "{}|{}".format(row['code_system'], row['code'])
+        else:
+            code = row['code']
+        if 'code' in table[row['model']][row['feature']]:
+            # feature裡面已經有code，則覆蓋+新增
+            table[row['model']][row['feature']]['code'] = table[row['model']
+                                                                ][row['feature']]['code'] + ",{}".format(code)
+        else:
+            table[row['model']][row['feature']]['code'] = code
+        table[row['model']][row['feature']]['type'] = row['type_of_data']
 
 
 @app.route('/')
 def index():
-    return "Hello, World!<br/><br/>請在網址列的/後面輸入你要搜尋的病患id即可得出結果<br/>Example: http://{網址}/{id}"
+    return "Hello, World!<br/><br/>請在網址列的/後面輸入你要搜尋的病患id即可得出結果<br/>Example: <a href=\"test-03121002\">http://localhost:5000/diabetes/test-03121002</a>"
 
 
 @app.route('/<id>')
-def main(id, default_time=None):
-    x = list()
-    if default_time == None:
-        temp = [6, get_glucose(id), get_blood_pressure(
-            id), 35, get_insulin(id), get_bmi(id), 0.627, get_age(id)]
-    else:
-        temp = [6, get_glucose(id, default_time), get_blood_pressure(
-            id, default_time), 35, get_insulin(id, default_time), get_bmi(id, default_time), 0.627, get_age(id, default_time)]
-    loaded_model = joblib.load('finalized_model.sav')
-    x.append(temp)
-    result = loaded_model.predict_proba(x)
-    # result = [no's probability, yes's probability]
-    return "沒有得病的機率為: {0}%<br/>有得病的機率為: {1}%".format(float("%.4f" % result[0, 0])*100, float("%.4f" % result[0, 1])*100)
+def id(id, default_time=None):
+    return redirect(url_for('id_with_api', api='diabetes', id=id))
 
 
-def get_glucose(id, default_time=datetime.datetime.utcnow().year):
-    resources = client.resources('Observation')
-    resources = resources.search(
-        Raw(**{'subject': id, 'code': '72-314'})).sort('-date')
-    # observation.code:text = "Glucose"
-    observations = resources.fetch()
-    for observation in observations:
-        return observation.valueQuantity.value
-
-
-def get_blood_pressure(id, default_time=None):
-    resources = client.resources('Observation')
-    resources = resources.search(
-        Raw(**{'subject': id, 'component-code': 'http://loinc.org|8462-4'})).sort('-date')
-    observations = resources.fetch()
-    # Get diastolic blood pressure value
-    for observation in observations:
-        for component in observation.component:
-            for coding in component.code.coding:
-                if coding.code == '8462-4':
-                    try:
-                        return component.valueQuantity.value
-                    except:
-                        continue
-
-
-def get_insulin(id, default_time=None):
-    resources = client.resources('Observation')
-    resources = resources.search(
-        Raw(**{'subject': id, 'code:text': 'Insulin'})).sort('-date')
-    # observation.code = "72-496"
-    observations = resources.fetch()
-    # why using fetch? Because observations will not only have one resource
-    # maybe we can use the function sort() and first() to fetch the first resource
-    for observation in observations:
-        return observation.valueQuantity.value
-
-
-def get_bmi(id, default_time=None):
-    resources = client.resources('Observation')
-    resources = resources.search(
-        Raw(**{'subject': id, 'code': 'http://loinc.org|29463-7'})).sort('-date')
-    weight_observation = resources.fetch()
-    for weights in weight_observation:
-        weight = {
-            'kg': weights.valueQuantity.value,
-            'pound': weights.valueQuantity.value * 0.45359237
-        }.get(weights.valueQuantity.unit, 0)
-
-    resources = client.resources('Observation')
-    resources = resources.search(
-        Raw(**{'subject': id, 'code': 'http://loinc.org|8302-2'})).sort('-date')
-    height_observation = resources.fetch()
-    for heights in height_observation:
-        height = {
-            'cm': heights.valueQuantity.value / 100,
-            'inch': heights.valueQuantity.value * 0.0254,
-            'm': heights.valueQuantity.value
-        }.get(heights.valueQuantity.unit, 0)
-
-    try:
-        return weight / height / height
-    except:
-        return 0
-
-
-def get_age(id, default_time=None):
-    # Getting patient data from server
-    resources = client.resources('Patient')
-    resources = resources.search(_id=id).limit(1)
-    patient = resources.get()
-    # age = time.now - patient.birthdate
-    # TODO: If we need the data that is 1 year before or so,
-    #       how to return the real age of one year before?
-    now_time = datetime.datetime.utcnow()
-    patient_birthdate = datetime.datetime.strptime(
-        patient.birthDate, '%Y-%m-%d')
-    age = now_time - patient_birthdate
-    return int(age.days/365)
+@app.route('/<api>/<id>')
+def id_with_api(api, id):
+    if api == 'diabetes':
+        return jsonify(json.loads(diabetes_predict(id, table['diabetes'])))
 
 
 if __name__ == '__main__':

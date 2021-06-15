@@ -1,0 +1,8 @@
+model,feature,code,code_system,type_of_data
+diabetes,glucose,72-314,https://www.cgmh.org.tw,laboratory
+diabetes,diastolic blood pressure,8462-4,,laboratory
+diabetes,insulin,72-496,https://www.cgmh.org.tw,laboratory
+diabetes,insulin,72-49B,https://www.cgmh.org.tw,laboratory
+diabetes,weight,29463-7,,laboratory
+diabetes,height,8302-2,,laboratory
+diabetes,hypertension,I10,,diagnosis
