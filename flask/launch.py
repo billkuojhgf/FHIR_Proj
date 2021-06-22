@@ -2,6 +2,7 @@ import csv
 import json
 from flask import Flask, url_for, redirect, jsonify
 from apis.diabetes import diabetes_predict
+from base.exceptions import *
 
 app = Flask(__name__)
 
@@ -20,6 +21,8 @@ with open(table_position, newline='') as table_example:
             code = "{}|{}".format(row['code_system'], row['code'])
         else:
             code = row['code']
+        if code == '':
+            raise FeatureCodeIsEmpty(row['feature'])
         if 'code' in table[row['model']][row['feature']]:
             # feature裡面已經有code，則覆蓋+新增
             table[row['model']][row['feature']]['code'] = table[row['model']
@@ -27,6 +30,7 @@ with open(table_position, newline='') as table_example:
         else:
             table[row['model']][row['feature']]['code'] = code
         table[row['model']][row['feature']]['type'] = row['type_of_data']
+        table[row['model']][row['feature']]['feature'] = row['feature']
 
 
 @app.route('/')
