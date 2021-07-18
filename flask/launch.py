@@ -1,6 +1,6 @@
 import csv
 import json
-from flask import Flask, url_for, redirect, jsonify
+from flask import Flask, url_for, redirect, jsonify, request
 from apis.diabetes import diabetes_predict
 from base.exceptions import *
 
@@ -33,20 +33,22 @@ with open(table_position, newline='') as table_example:
         table[row['model']][row['feature']]['feature'] = row['feature']
 
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
-    return "Hello, World!<br/><br/>請在網址列的/後面輸入你要搜尋的病患id即可得出結果<br/>Example: <a href=\"test-03121002\">http://localhost:5000/diabetes/test-03121002</a>"
+    name = ""
+    if request.values.get('name'):
+        name = request.values.get('name')
+        return "Hello " + name
+    return "Hello, World!<br/><br/>請在網址列的/後面輸入你要搜尋的病患id即可得出結果<br/>Example: <a href=\"/diabetes?id=test-03121002\">http://localhost:5000/diabetes?id=test-03121002</a>"
 
 
-@app.route('/<id>')
-def id(id, default_time=None):
-    return redirect(url_for('id_with_api', api='diabetes', id=id))
-
-
-@app.route('/<api>/<id>')
-def id_with_api(api, id):
+@app.route('/<api>', methods=['GET'])
+def id_with_api(api):
     if api == 'diabetes':
-        return jsonify(json.loads(diabetes_predict(id, table['diabetes'])))
+        if request.values.get('id'):
+            id = request.values.get('id')
+            return jsonify(diabetes_predict(id, table['diabetes']))
+    return "此為Diabetes模型的預測API，請在url後面加入相對應的args參數<br/>Example: <a href=\"/diabetes?id=test-03121002\">http://localhost:5000/diabetes?id=test-03121002</a>"
 
 
 if __name__ == '__main__':

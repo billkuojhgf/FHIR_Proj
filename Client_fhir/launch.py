@@ -47,36 +47,34 @@ def diabetes(id, table, default_time=None):
 
 
 def get_resources(id, table, default_time):
-    if table['type'].lower() == 'laboratory':
+    if table['type'].lower() == 'observation':
         # How to differentiate the code that user give is code or component-code?
         resources = CLIENT.resources('Observation')
-        try:
-            data = resources.search(subject=id, date__ge=(default_time - relativedelta(
-                years=5)).strftime('%Y-%m-%d'), code=table['code']).sort('-date').limit(1)
-            resource = data.get()
-            is_in_component = False
-        except ResourceNotFound:
-            try:
-                data = resources.search(subject=id, date__ge=(default_time - relativedelta(
-                    years=5)).strftime('%Y-%m-%d'), component_code=table['code']).sort('-date').limit(1)
-                resource = data.get()
-                is_in_component = True
-            except ResourceNotFound:
+        search = resources.search(subject=id, date__ge=(default_time - relativedelta(
+            years=5)).strftime('%Y-%m-%d'), code=table['code']).sort('-date').limit(1)
+        resources = search.fetch()
+        is_in_component = False
+        if len(resources) == 0:
+            resources = CLIENT.resources('Observation')
+            search = resources.search(subject=id, date__ge=(default_time - relativedelta(
+                years=5)).strftime('%Y-%m-%d'), component_code=table['code']).sort('-date').limit(1)
+            resources = search.fetch()
+            is_in_component = True
+            if len(resources) == 0:
                 raise ResourceNotFound(
                     'Could not find the resources, no enough data for the patient')
-        return {'resource': resource, 'is_in_component': is_in_component, 'component-code': table['code'] if is_in_component else '', 'type': 'laboratory'}
-
-    elif table['type'].lower() == 'diagnosis':
+        for resource in resources:
+            return {'resource': resource, 'is_in_component': is_in_component, 'component-code': table['code'] if is_in_component else '', 'type': 'laboratory'}
+    elif table['type'].lower() == 'condition':
         resources = CLIENT.resources('Condition')
-        data = resources.search(
+        search = resources.search(
             subject=id, code=table['code']).sort('-date').limit(1)
-        try:
-            resource = data.get()
-        except ResourceNotFound:
+        resources = search.fetch()
+        if len(resources) == 0:
             return {'resource': None, 'is_in_component': False, 'type': 'diagnosis'}
         else:
-            return {'resource': resource, 'is_in_component': False, 'type': 'diagnosis'}
-
+            for resource in resources:
+                return {'resource': resource, 'is_in_component': False, 'type': 'diagnosis'}
     else:
         raise Exception('unknown type of data')
 

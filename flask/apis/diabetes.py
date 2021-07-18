@@ -34,4 +34,4 @@ def diabetes_predict(id, table, default_time=None):
         result_dict[key] = dict()
         result_dict[key]['date'] = get_resource_datetime(data[key])
         result_dict[key]['value'] = get_value(data[key])
-    return json.dumps(result_dict)
+    return result_dict

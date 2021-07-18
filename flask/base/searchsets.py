@@ -8,39 +8,40 @@ from base.exceptions import *
 
 CLIENT = SyncFHIRClient('http://192.168.0.125:5555/fhir')
 
+
 def get_resources(id, table, default_time):
     if table['type'].lower() == 'observation':
         # How to differentiate the code that user give is code or component-code?
         resources = CLIENT.resources('Observation')
-        try:
-            data = resources.search(subject=id, date__ge=(default_time - relativedelta(
-                years=5)).strftime('%Y-%m-%d'), code=table['code']).sort('-date').limit(1)
-            resource = data.get()
-            is_in_component = False
-        except ResourceNotFound:
-            try:
-                data = resources.search(subject=id, date__ge=(default_time - relativedelta(
-                    years=5)).strftime('%Y-%m-%d'), component_code=table['code']).sort('-date').limit(1)
-                resource = data.get()
-                is_in_component = True
-            except ResourceNotFound:
+        search = resources.search(subject=id, date__ge=(default_time - relativedelta(
+            years=5)).strftime('%Y-%m-%d'), code=table['code']).sort('-date').limit(1)
+        resources = search.fetch()
+        is_in_component = False
+        if len(resources) == 0:
+            resources = CLIENT.resources('Observation')
+            search = resources.search(subject=id, date__ge=(default_time - relativedelta(
+                years=5)).strftime('%Y-%m-%d'), component_code=table['code']).sort('-date').limit(1)
+            resources = search.fetch()
+            is_in_component = True
+            if len(resources) == 0:
                 raise ResourceNotFound(
-                    "Could not find the resources {}, no enough data for the patient".format(table['feature']))
-        return {'resource': resource, 'is_in_component': is_in_component, 'component-code': table['code'] if is_in_component else '', 'type': 'laboratory'}
+                    'Could not find the resources, no enough data for the patient')
+        for resource in resources:
+            return {'resource': resource, 'is_in_component': is_in_component, 'component-code': table['code'] if is_in_component else '', 'type': 'laboratory'}
 
     elif table['type'].lower() == 'condition':
         resources = CLIENT.resources('Condition')
-        data = resources.search(
+        search = resources.search(
             subject=id, code=table['code']).sort('-date').limit(1)
-        try:
-            resource = data.get()
-        except ResourceNotFound:
+        resources = search.fetch()
+        if len(resources) == 0:
             return {'resource': None, 'is_in_component': False, 'type': 'diagnosis'}
         else:
-            return {'resource': resource, 'is_in_component': False, 'type': 'diagnosis'}
+            for resource in resources:
+                return {'resource': resource, 'is_in_component': False, 'type': 'diagnosis'}
 
     else:
-        raise TypeUnknown('unknown type of data: {}'.format(table['feature']))
+        raise Exception('unknown type of data')
 
 
 def get_age(id, default_time):
@@ -78,9 +79,13 @@ def get_value(dictionary):
 def get_resource_datetime(dictionary):
     # dictionary = {'resource': resource, 'is_in_component': type(boolean), 'component-code': type(str), 'type': 'laboratory' or 'diagnosis'}
     if type(dictionary) is not dict:
-        return 'null'
+        return None
+
     if dictionary['type'] == 'diagnosis':
-        return dictionary['resource'].recordedDate[:10]
+        try:
+            dictionary['resource'].recordedDate[:10]
+        except AttributeError:
+            return None
     elif dictionary['type'] == 'laboratory':
         try:
             return dictionary['resource'].effectiveDateTime[:10]
@@ -88,7 +93,7 @@ def get_resource_datetime(dictionary):
             try:
                 return dictionary['resource'].effectivePeriod.start[:10]
             except KeyError:
-                return 'null'
+                return None
 
 
 def bmi(height_resource, weight_resource):
