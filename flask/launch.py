@@ -1,10 +1,12 @@
 import csv
 import json
 from flask import Flask, url_for, redirect, jsonify, request
+from flask_cors import CORS
 from apis.diabetes import diabetes_predict
 from base.exceptions import *
 
 app = Flask(__name__)
+CORS(app)
 
 # Map the csv into dictionary
 table_position = "./table/table_example.csv"
@@ -42,12 +44,14 @@ def index():
     return "Hello, World!<br/><br/>請在網址列的/後面輸入你要搜尋的病患id即可得出結果<br/>Example: <a href=\"/diabetes?id=test-03121002\">http://localhost:5000/diabetes?id=test-03121002</a>"
 
 
-@app.route('/<api>', methods=['GET'])
+@app.route('/<api>', methods=['GET', 'POST'])
 def id_with_api(api):
     if api == 'diabetes':
         if request.values.get('id'):
             id = request.values.get('id')
             return jsonify(diabetes_predict(id, table['diabetes']))
+    elif api == 'cancer':
+        return ""
     return "此為Diabetes模型的預測API，請在url後面加入相對應的args參數<br/>Example: <a href=\"/diabetes?id=test-03121002\">http://localhost:5000/diabetes?id=test-03121002</a>"
 
 
