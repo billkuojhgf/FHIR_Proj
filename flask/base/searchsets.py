@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from base.exceptions import *
 
-CLIENT = SyncFHIRClient('http://192.168.0.125:5555/fhir')
+CLIENT = SyncFHIRClient('http://localhost:5555/fhir')
 
 
 def get_resources(id, table, default_time):
@@ -34,7 +34,7 @@ def get_resources(id, table, default_time):
         search = resources.search(
             subject=id, code=table['code']).sort('-date').limit(1)
         resources = search.fetch()
-        if len(resources) == 0:
+        if len(resources) == 0:  # 沒有此condition的搜尋結果
             return {'resource': None, 'is_in_component': False, 'type': 'diagnosis'}
         else:
             for resource in resources:
@@ -76,14 +76,14 @@ def get_value(dictionary):
                 return dictionary['resource'].valueString
 
 
-def get_resource_datetime(dictionary):
+def get_resource_datetime(dictionary, default_time):
     # dictionary = {'resource': resource, 'is_in_component': type(boolean), 'component-code': type(str), 'type': 'laboratory' or 'diagnosis'}
     if type(dictionary) is not dict:
-        return None
+        return default_time.strftime("%Y-%m-%d")
 
     if dictionary['type'] == 'diagnosis':
         try:
-            dictionary['resource'].recordedDate[:10]
+            return dictionary['resource'].recordedDate[:10]
         except AttributeError:
             return None
     elif dictionary['type'] == 'laboratory':
@@ -101,12 +101,11 @@ def bmi(height_resource, weight_resource):
     weight = {
         'kg': weight_resource.valueQuantity.value,
         'g': weight_resource.valueQuantity.value / 1000,
-        'pound': weight_resource.valueQuantity.value * 0.45359237
+        '[lb_av]': weight_resource.valueQuantity.value * 0.45359237
     }.get(weight_resource.valueQuantity.unit, 0)
     height = {
         'cm': height_resource.valueQuantity.value / 100,
-        'inch': height_resource.valueQuantity.value * 0.0254,
-        'm': height_resource.valueQuantity.value
+        '[in_i]': height_resource.valueQuantity.value * 0.0254,
     }.get(height_resource.valueQuantity.unit, 0)
 
     return weight / height / height

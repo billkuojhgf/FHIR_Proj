@@ -38,7 +38,7 @@ def create_resource(
             resources, resource["id"]))
 
 
-url = "http://192.168.0.125:5555/fhir"
+url = "http://localhost:5555/fhir"
 path = input("請輸入檔案夾路徑: ")
 create_resource(url, path)
 

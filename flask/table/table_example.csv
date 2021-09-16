@@ -6,3 +6,9 @@ diabetes,insulin,72-49B,https://www.cgmh.org.tw,observation
 diabetes,weight,29463-7,http://loinc.org,observation
 diabetes,height,8302-2,http://loinc.org,observation
 diabetes,hypertension,I10,,condition
+qcsi,respiratory rate,OA04,https://www.cgmh.org.tw,observation
+qcsi,pulse oximetry,OA08,https://www.cgmh.org.tw,observation
+qcsi,o2 flow rate,3151-8,http://loinc.org,observation
+rox,spo2,OA08,https://www.cgmh.org.tw,observation
+rox,respiratory rate,OA04,https://www.cgmh.org.tw,observation
+rox,fio2,3151-8,http://loinc.org,observation

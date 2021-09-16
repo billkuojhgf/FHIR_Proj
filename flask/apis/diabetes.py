@@ -1,5 +1,3 @@
-import json
-
 import joblib
 import datetime
 
@@ -7,7 +5,7 @@ from base.searchsets import *
 
 
 def diabetes_predict(id, table, default_time=None):
-    # default_time變數是為模型訓練用(type=date or datetime)，數值放入patient得病的時間，None表示使用現在時間
+    # default_time變數是為模型訓練用(type=date or datetime)，數值放入patient得病的時間，None表示使用現在時間`
     if default_time == None:
         default_time = datetime.datetime.now()
 
@@ -32,6 +30,7 @@ def diabetes_predict(id, table, default_time=None):
     result_dict['predict_value'] = result_proba[:, 1][0]
     for key in data:
         result_dict[key] = dict()
-        result_dict[key]['date'] = get_resource_datetime(data[key])
+        result_dict[key]['date'] = get_resource_datetime(
+            data[key], default_time)
         result_dict[key]['value'] = get_value(data[key])
     return result_dict
