@@ -15,13 +15,13 @@
 
 - 傳統資料互通架構
 
-    ![%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a.gif](%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a.gif)
+    ![%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a.gif](./Picture/traditional%20data%20exchange%20architecture.gif)
 
     傳統架構中，因為每個醫院所導入的資料庫以及每個table的column都不盡相同，在交換資料時會出現很多資料不一致的情形，導致無法交流
 
 - FHIR的伺服器互通架構
 
-    ![%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a/FHIR.gif](%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a/FHIR.gif)
+    ![%E7%B0%A1%E4%BB%8BFHIR%2088ee7609145848baaa807ef5f127f60a/FHIR.gif](./Picture/FHIR%20architecture.gif)
 
     在導入FHIR的伺服器架構後，因為兩者的格式一致，所以可以互相交流
 
