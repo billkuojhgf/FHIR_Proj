@@ -12,9 +12,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
     />
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
       crossorigin="anonymous"
     />
     <link
@@ -25,6 +25,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css"
     />
+    <link rel="stylesheet" href="./reset.css" />
     <link rel="stylesheet" href="./style.css" />
     <!-- development version, includes helpful console warnings -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
@@ -37,11 +38,6 @@
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
       integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
   </head>
@@ -68,15 +64,13 @@
           autocomplete="off"
         />
         <div class="result">
-          <input type="date" name="date" v-show="model=='diabetes'" />
-
           <input type="button" value="Search it!" @click="searchQuery" />
         </div>
       </div>
 
       <div
         id="diabetes-model"
-        class="form form-result"
+        class="form-result"
         v-show="model=='diabetes'&hasData"
       >
         <div id="diabetes-model-result">
@@ -109,8 +103,7 @@
                 <input
                   type="radio"
                   name="radio_bool"
-                  value="true"
-                  v-model="item.value"
+                  :checked="item.value"
                   @click="radioclicks(key, true)"
                 />
                 True
@@ -119,8 +112,7 @@
                 <input
                   type="radio"
                   name="radio_bool"
-                  value="false"
-                  v-model="item.value"
+                  :checked="!item.value"
                   @click="radioclicks(key, false)"
                 />
                 False
@@ -143,170 +135,281 @@
           {{ key }}, {{item.date}}, {{ item.value }}
         </label> -->
       </div>
-      <div id="qcsi_model" class="form form-result" v-show="model=='qcsi'">
+      <div id="qcsi_model" class="form-result" v-show="model=='qcsi'">
         <div class="result" id="qCSI_rr">
           <h6>Respiratory Rate</h6>
-          <input type="date" id="datepicker" name="date" />
-          <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_rr" />
-              ≤22
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_rr" />
-              23~28
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_rr" />
-              >28
-            </label>
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="qcsi_value['respiratory rate']['date']"
+          />
+          <div
+            class="btn-group"
+            role="group"
+            aria-label="Basic radio toggle button group"
+          >
+            <input
+              type="radio"
+              id="radio_qcsi_rr_1"
+              class="btn-check"
+              name="radio_qcsi_rr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 0)"
+              :checked="qcsi_value['respiratory rate']['value'] == 0"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_rr_1"
+              >≤22</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_rr_2"
+              class="btn-check"
+              name="radio_qcsi_rr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 1)"
+              :checked="qcsi_value['respiratory rate']['value'] == 1"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_rr_2"
+              >23~28</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_rr_3"
+              class="btn-check"
+              name="radio_qcsi_rr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 2)"
+              :checked="qcsi_value['respiratory rate']['value'] == 2"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_rr_3"
+              >>28</label
+            >
           </div>
         </div>
         <div class="result" id="qCSI_pulse">
           <h6>Pulse oximetry</h6>
-          <input type="date" id="datepicker" name="date" />
-          <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_pulse" />
-              >92
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_pulse" />
-              89~92
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_pulse" />
-              ≤88
-            </label>
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="qcsi_value['spo2']['date']"
+          />
+          <div
+            class="btn-group"
+            role="group"
+            aria-label="Basic radio toggle button group"
+          >
+            <input
+              type="radio"
+              id="radio_qcsi_pulse_1"
+              class="btn-check"
+              name="radio_qcsi_pulse"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 0)"
+              :checked="qcsi_value['spo2']['value'] == 0"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_pulse_1"
+              >>92</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_pulse_2"
+              class="btn-check"
+              name="radio_qcsi_pulse"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 2)"
+              :checked="qcsi_value['spo2']['value'] == 2"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_pulse_2"
+              >89~92</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_pulse_3"
+              class="btn-check"
+              name="radio_qcsi_pulse"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 5)"
+              :checked="qcsi_value['spo2']['value'] == 5"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_pulse_3"
+              >≤88</label
+            >
           </div>
         </div>
         <div class="result" id="qCSI_fr">
           <h6>O₂ flow rate</h6>
-          <input type="date" id="datepicker" name="date" />
-          <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_fr" />
-              ≤2
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_fr" />
-              3~4
-            </label>
-            <label class="btn btn-secondary">
-              <input type="radio" name="radio_qcsi_fr" />
-              5~6
-            </label>
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="qcsi_value['fio2']['date']"
+          />
+          <div
+            class="btn-group"
+            role="group"
+            aria-label="Basic radio toggle button group"
+          >
+            <input
+              type="radio"
+              id="radio_qcsi_fr_1"
+              class="btn-check"
+              name="radio_qcsi_fr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 0)"
+              :checked="qcsi_value['fio2']['value'] == 0"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_fr_1"
+              >≤2L</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_fr_2"
+              class="btn-check"
+              name="radio_qcsi_fr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 4)"
+              :checked="qcsi_value['fio2']['value'] == 4"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_fr_2"
+              >3~4L</label
+            >
+
+            <input
+              type="radio"
+              id="radio_qcsi_fr_3"
+              class="btn-check"
+              name="radio_qcsi_fr"
+              autocomplete="off"
+              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 5)"
+              :checked="qcsi_value['fio2']['value'] == 5"
+            />
+            <label class="btn btn-outline-primary" for="radio_qcsi_fr_3"
+              >5~6L</label
+            >
           </div>
         </div>
 
-        <div id="qcsi_info" class="tab">
-          <button class="tablinks" onClick="openCity(event, 'Evidence_qcsi')">
-            Evidence
-          </button>
-          <button class="tablinks" onClick="openCity(event, 'Result_qcsi')">
-            Result
-          </button>
-        </div>
-        <div id="Evidence_qcsi" class="tabcontent">
-          <span
-            onclick="this.parentElement.style.display='none'"
-            class="topright"
-            >&times</span
-          >
-          <div id="formula">
-            <h2>Formula</h2>
-            <div>
-              <p>Addition of the selected points:</p>
-              <table>
-                <tbody>
-                  <tr>
-                    <td colspan="2">
-                      <p><strong>Variable</strong></p>
-                    </td>
-                    <td><strong>Points</strong></td>
-                  </tr>
-                  <tr>
-                    <td rowspan="3">
-                      Repiratory rate, breaths/min<br /><br />
-                    </td>
-                    <td>
-                      <p>≤22</p>
-                    </td>
-                    <td>0</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>23-28</p>
-                    </td>
-                    <td>1</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>&gt;28</p>
-                    </td>
-                    <td>2</td>
-                  </tr>
-                  <tr>
-                    <td rowspan="3">Pulse oximetry*<br /><br /></td>
-                    <td>
-                      <p>&gt;92%</p>
-                    </td>
-                    <td>0</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>89-92%</p>
-                    </td>
-                    <td>2</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>≤88%</p>
-                    </td>
-                    <td>5</td>
-                  </tr>
-                  <tr>
-                    <td rowspan="3">
-                      O<sub>2</sub> flow rate, L/min<br /><br />
-                    </td>
-                    <td>
-                      <p>≤2</p>
-                    </td>
-                    <td>0</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>3-4</p>
-                    </td>
-                    <td>4</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <p>5-6</p>
-                    </td>
-                    <td>5</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p>
-                *The lowest value recorded during the first four hours of the
-                patient encounter.
-              </p>
+        <div id="evidence_qcsi_result">
+          <div id="qcsi_info" class="tab">
+            <button class="tablinks" onClick="openCity(event, 'Evidence_qcsi')">
+              Evidence
+            </button>
+            <button class="tablinks" onClick="openCity(event, 'Result_qcsi')">
+              Result
+            </button>
+          </div>
+          <div id="Evidence_qcsi" class="tabcontent">
+            <span
+              onclick="this.parentElement.style.display='none'"
+              class="topright"
+              >&times</span
+            >
+            <div id="formula">
+              <h2>Formula</h2>
+              <div>
+                <p>Addition of the selected points:</p>
+                <table height="350">
+                  <tbody>
+                    <tr>
+                      <td colspan="2">
+                        <p><strong>Variable</strong></p>
+                      </td>
+                      <td><strong>Points</strong></td>
+                    </tr>
+                    <tr>
+                      <td rowspan="3">
+                        Repiratory rate, breaths/min<br /><br />
+                      </td>
+                      <td>
+                        <p>≤22</p>
+                      </td>
+                      <td>0</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>23-28</p>
+                      </td>
+                      <td>1</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>&gt;28</p>
+                      </td>
+                      <td>2</td>
+                    </tr>
+                    <tr>
+                      <td rowspan="3">Pulse oximetry*<br /><br /></td>
+                      <td>
+                        <p>&gt;92%</p>
+                      </td>
+                      <td>0</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>89-92%</p>
+                      </td>
+                      <td>2</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>≤88%</p>
+                      </td>
+                      <td>5</td>
+                    </tr>
+                    <tr>
+                      <td rowspan="3">
+                        O<sub>2</sub> flow rate, L/min<br /><br />
+                      </td>
+                      <td>
+                        <p>≤2</p>
+                      </td>
+                      <td>0</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>3-4</p>
+                      </td>
+                      <td>4</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p>5-6</p>
+                      </td>
+                      <td>5</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  *The lowest value recorded during the first four hours of the
+                  patient encounter.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div id="Result_qcsi" class="tabcontent">
-          <span
-            onclick="this.parentElement.style.display='none'"
-            class="topright"
-            >&times</span
-          >
-          <h3>Result</h3>
+          <div id="Result_qcsi" class="tabcontent">
+            <span
+              onclick="this.parentElement.style.display='none'"
+              class="topright"
+              >&times</span
+            >
+            <h2>Result</h2>
+            <p>
+              {{ qcsi_value["fio2"].value + qcsi_value["respiratory rate"].value
+              + qcsi_value["spo2"].value }}
+            </p>
+          </div>
         </div>
       </div>
 
-      <div id="rox_model" class="form form-result" v-show="model=='rox'">
+      <div id="rox_model" class="form-result" v-show="model=='rox'">
         <div class="result" id="rox_rr">
           <h6>SpO₂</h6>
           <input type="date" id="datepicker" name="date" />
@@ -323,120 +426,122 @@
           <input type="text" />
         </div>
 
-        <div id="rox_info" class="tab">
-          <button class="tablinks" onClick="openCity(event, 'Evidence_rox')">
-            Evidence
-          </button>
-          <button class="tablinks" onClick="openCity(event, 'Result_rox')">
-            Result
-          </button>
-        </div>
-        <div id="Evidence_rox" class="tabcontent">
-          <div id="formula">
-            <h2>Formula</h2>
-            <div>
-              <p>
-                <span
-                  id="docs-internal-guid-69c8677d-7fff-a7d4-e0d4-835056d73351"
-                  >ROX Index = SpO₂/FiO₂*, % / Respiratory rate,
-                  breaths/min</span
-                >
-              </p>
-              <p>&nbsp;</p>
-              <p>*Estimating FiO₂ from oxygen flow/delivery rates:</p>
-              <div dir="ltr" align="left">
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <p dir="ltr"><strong>Type of O₂ delivery</strong></p>
-                      </td>
-                      <td>
-                        <p dir="ltr"><strong>Flow rates, L/min</strong></p>
-                      </td>
-                      <td>
-                        <p dir="ltr"><strong>FiO₂</strong></p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p dir="ltr">Nasal cannula</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">1-6</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">
-                          ~4% FiO₂ added above room air* per 1 L/min
-                        </p>
-                        <ul>
-                          <li>Room air = 21%&nbsp;</li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">1 L/min = 25%</p>
-                          </li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">2 L/min = 29%</p>
-                          </li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">3 L/min = 33%</p>
-                          </li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">4 L/min = 37%</p>
-                          </li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">5 L/min = 41%</p>
-                          </li>
-                          <li dir="ltr">
-                            <p dir="ltr" role="presentation">6 L/min = 45%</p>
-                          </li>
-                        </ul>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p dir="ltr">Simple face mask</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">~6-12</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">35-60%*</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p dir="ltr">Non-rebreather mask</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">10-15</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">~70-90%</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <p dir="ltr">High-flow nasal cannula</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">Up to 60</p>
-                      </td>
-                      <td>
-                        <p dir="ltr">30-100%</p>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+        <div id="evidence_result_rox">
+          <div id="rox_info" class="tab">
+            <button class="tablinks" onClick="openCity(event, 'Evidence_rox')">
+              Evidence
+            </button>
+            <button class="tablinks" onClick="openCity(event, 'Result_rox')">
+              Result
+            </button>
+          </div>
+          <div id="Evidence_rox" class="tabcontent">
+            <div id="formula">
+              <h2>Formula</h2>
+              <div>
+                <p>
+                  <span
+                    id="docs-internal-guid-69c8677d-7fff-a7d4-e0d4-835056d73351"
+                    >ROX Index = SpO₂/FiO₂*, % / Respiratory rate,
+                    breaths/min</span
+                  >
+                </p>
+                <p>&nbsp;</p>
+                <p>*Estimating FiO₂ from oxygen flow/delivery rates:</p>
+                <div dir="ltr" align="left">
+                  <table>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <p dir="ltr"><strong>Type of O₂ delivery</strong></p>
+                        </td>
+                        <td>
+                          <p dir="ltr"><strong>Flow rates, L/min</strong></p>
+                        </td>
+                        <td>
+                          <p dir="ltr"><strong>FiO₂</strong></p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p dir="ltr">Nasal cannula</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">1-6</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">
+                            ~4% FiO₂ added above room air* per 1 L/min
+                          </p>
+                          <ul>
+                            <li>Room air = 21%&nbsp;</li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">1 L/min = 25%</p>
+                            </li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">2 L/min = 29%</p>
+                            </li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">3 L/min = 33%</p>
+                            </li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">4 L/min = 37%</p>
+                            </li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">5 L/min = 41%</p>
+                            </li>
+                            <li dir="ltr">
+                              <p dir="ltr" role="presentation">6 L/min = 45%</p>
+                            </li>
+                          </ul>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p dir="ltr">Simple face mask</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">~6-12</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">35-60%*</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p dir="ltr">Non-rebreather mask</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">10-15</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">~70-90%</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p dir="ltr">High-flow nasal cannula</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">Up to 60</p>
+                        </td>
+                        <td>
+                          <p dir="ltr">30-100%</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p dir="ltr">
+                  *Varies based on respiratory rate and minute ventilation.
+                </p>
               </div>
-              <p dir="ltr">
-                *Varies based on respiratory rate and minute ventilation.
-              </p>
             </div>
           </div>
-        </div>
 
-        <div id="Result_rox" class="tabcontent">
-          <h3>Result</h3>
+          <div id="Result_rox" class="tabcontent">
+            <h2>Result</h2>
+          </div>
         </div>
       </div>
 
@@ -469,5 +574,10 @@
     </script>
     <script src="./script.js"></script>
     <script src="./action.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
