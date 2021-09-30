@@ -49,7 +49,11 @@
     <div id="app" class="form-wrapper">
       <div class="form">
         <label for="search">Search for</label>
-        <select id="search" v-model="model">
+        <select
+          id="search"
+          v-model="model"
+          @change="hasData=false;isClick=false;"
+        >
           <option value="diabetes">Diabetes Model</option>
           <option value="qcsi">Quick Covid-19 Severity Index(qCSI)</option>
           <option value="rox">ROX Index</option>
@@ -71,7 +75,7 @@
       <div
         id="diabetes-model"
         class="form-result"
-        v-show="model=='diabetes'&hasData"
+        v-if="model=='diabetes'&hasData"
       >
         <div id="diabetes-model-result">
           <label id="output">Model Output: </label>
@@ -127,7 +131,12 @@
               name="date"
               v-model="item.date"
             />
-            <input type="text" name="data" v-model="item.value" />
+            <input
+              type="text"
+              name="data"
+              v-model="item.value"
+              @change="textchange"
+            />
           </div>
         </div>
 
@@ -135,14 +144,14 @@
           {{ key }}, {{item.date}}, {{ item.value }}
         </label> -->
       </div>
-      <div id="qcsi_model" class="form-result" v-show="model=='qcsi'">
+      <div id="qcsi_model" class="form-result" v-if="model=='qcsi'&hasData">
         <div class="result" id="qCSI_rr">
           <h6>Respiratory Rate</h6>
           <input
             type="date"
             id="datepicker"
             name="date"
-            v-model="qcsi_value['respiratory rate']['date']"
+            v-model="results['respiratory rate']['date']"
           />
           <div
             class="btn-group"
@@ -155,8 +164,8 @@
               class="btn-check"
               name="radio_qcsi_rr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 0)"
-              :checked="qcsi_value['respiratory rate']['value'] == 0"
+              @click="radioclicks('respiratory rate', 0)"
+              :checked="results['respiratory rate']['value'] == 0"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_rr_1"
               >≤22</label
@@ -168,8 +177,8 @@
               class="btn-check"
               name="radio_qcsi_rr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 1)"
-              :checked="qcsi_value['respiratory rate']['value'] == 1"
+              @click="radioclicks('respiratory rate', 1)"
+              :checked="results['respiratory rate']['value'] == 1"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_rr_2"
               >23~28</label
@@ -181,8 +190,8 @@
               class="btn-check"
               name="radio_qcsi_rr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'respiratory rate', 2)"
-              :checked="qcsi_value['respiratory rate']['value'] == 2"
+              @click="radioclicks('respiratory rate', 2)"
+              :checked="results['respiratory rate']['value'] == 2"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_rr_3"
               >>28</label
@@ -195,7 +204,7 @@
             type="date"
             id="datepicker"
             name="date"
-            v-model="qcsi_value['spo2']['date']"
+            v-model="results['pulse oximetry']['date']"
           />
           <div
             class="btn-group"
@@ -208,8 +217,8 @@
               class="btn-check"
               name="radio_qcsi_pulse"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 0)"
-              :checked="qcsi_value['spo2']['value'] == 0"
+              @click="radioclicks('pulse oximetry', 0)"
+              :checked="results['pulse oximetry']['value'] == 0"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_pulse_1"
               >>92</label
@@ -221,8 +230,8 @@
               class="btn-check"
               name="radio_qcsi_pulse"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 2)"
-              :checked="qcsi_value['spo2']['value'] == 2"
+              @click="radioclicks('pulse oximetry', 2)"
+              :checked="results['pulse oximetry']['value'] == 2"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_pulse_2"
               >89~92</label
@@ -234,8 +243,8 @@
               class="btn-check"
               name="radio_qcsi_pulse"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'spo2', 5)"
-              :checked="qcsi_value['spo2']['value'] == 5"
+              @click="radioclicks('pulse oximetry', 5)"
+              :checked="results['pulse oximetry']['value'] == 5"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_pulse_3"
               >≤88</label
@@ -248,7 +257,7 @@
             type="date"
             id="datepicker"
             name="date"
-            v-model="qcsi_value['fio2']['date']"
+            v-model="results['o2 flow rate']['date']"
           />
           <div
             class="btn-group"
@@ -261,8 +270,8 @@
               class="btn-check"
               name="radio_qcsi_fr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 0)"
-              :checked="qcsi_value['fio2']['value'] == 0"
+              @click="radioclicks('o2 flow rate', 0)"
+              :checked="results['o2 flow rate']['value'] == 0"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_fr_1"
               >≤2L</label
@@ -274,8 +283,8 @@
               class="btn-check"
               name="radio_qcsi_fr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 4)"
-              :checked="qcsi_value['fio2']['value'] == 4"
+              @click="radioclicks('o2 flow rate', 4)"
+              :checked="results['o2 flow rate']['value'] == 4"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_fr_2"
               >3~4L</label
@@ -287,8 +296,8 @@
               class="btn-check"
               name="radio_qcsi_fr"
               autocomplete="off"
-              @click="radio_qcsi_rox_clicks('qcsi', 'fio2', 5)"
-              :checked="qcsi_value['fio2']['value'] == 5"
+              @click="radioclicks('o2 flow rate', 5)"
+              :checked="results['o2 flow rate']['value'] == 5"
             />
             <label class="btn btn-outline-primary" for="radio_qcsi_fr_3"
               >5~6L</label
@@ -298,10 +307,10 @@
 
         <div id="evidence_qcsi_result">
           <div id="qcsi_info" class="tab">
-            <button class="tablinks" onClick="openCity(event, 'Evidence_qcsi')">
+            <button class="tablinks" onClick="openTab(event, 'Evidence_qcsi')">
               Evidence
             </button>
-            <button class="tablinks" onClick="openCity(event, 'Result_qcsi')">
+            <button class="tablinks" onClick="openTab(event, 'Result_qcsi')">
               Result
             </button>
           </div>
@@ -401,37 +410,49 @@
               >&times</span
             >
             <h2>Result</h2>
-            <p>
-              {{ qcsi_value["fio2"].value + qcsi_value["respiratory rate"].value
-              + qcsi_value["spo2"].value }}
-            </p>
+            <p>{{ predict_value }}</p>
           </div>
         </div>
       </div>
 
-      <div id="rox_model" class="form-result" v-show="model=='rox'">
-        <div class="result" id="rox_rr">
-          <h6>SpO₂</h6>
-          <input type="date" id="datepicker" name="date" />
-          <input type="text" />
-        </div>
+      <div id="rox_model" class="form-result" v-if="model=='rox'&hasData">
         <div class="result" id="rox_pulse">
-          <h6>FiO₂</h6>
-          <input type="date" id="datepicker" name="date" />
-          <input type="text" />
+          <h6>SpO₂</h6>
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="results['spo2']['date']"
+          />
+          <input type="text" v-model="results['spo2']['value']" />
         </div>
         <div class="result" id="rox_fr">
+          <h6>FiO₂</h6>
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="results['fio2']['date']"
+          />
+          <input type="text" v-model="results['fio2']['value']" />
+        </div>
+        <div class="result" id="rox_rr">
           <h6>Respiratory rate</h6>
-          <input type="date" id="datepicker" name="date" />
-          <input type="text" />
+          <input
+            type="date"
+            id="datepicker"
+            name="date"
+            v-model="results['respiratory rate']['date']"
+          />
+          <input type="text" v-model="results['respiratory rate']['value']" />
         </div>
 
         <div id="evidence_result_rox">
           <div id="rox_info" class="tab">
-            <button class="tablinks" onClick="openCity(event, 'Evidence_rox')">
+            <button class="tablinks" onClick="openTab(event, 'Evidence_rox')">
               Evidence
             </button>
-            <button class="tablinks" onClick="openCity(event, 'Result_rox')">
+            <button class="tablinks" onClick="openTab(event, 'Result_rox')">
               Result
             </button>
           </div>
@@ -541,6 +562,7 @@
 
           <div id="Result_rox" class="tabcontent">
             <h2>Result</h2>
+            <p>{{ predict_value }}</p>
           </div>
         </div>
       </div>
@@ -551,7 +573,7 @@
     </div>
     <!-- partial -->
     <script>
-      function openCity(evt, Name) {
+      function openTab(evt, Name) {
         // Declare all variables
         var i, tabcontent, tablinks;
 

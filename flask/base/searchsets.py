@@ -45,6 +45,7 @@ def get_resources(id, table, default_time):
 
 
 def get_age(id, default_time):
+    # TODO: 把取得Patient資料的這個流程加入到get_resources中
     # Getting patient data from server
     resources = CLIENT.resources('Patient')
     resources = resources.search(_id=id).limit(1)
@@ -56,7 +57,8 @@ def get_age(id, default_time):
     return int(age.days / 365)
 
 
-def get_value(dictionary):
+def get_resource_value(dictionary):
+    # For value that are not a json format
     if type(dictionary) is not dict:
         return dictionary
     # dictionary = {'resource': resource, 'is_in_component': type(boolean), 'component-code': type(str), 'type': 'laboratory' or 'diagnosis'}

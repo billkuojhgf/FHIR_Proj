@@ -2,7 +2,9 @@ import csv
 import json
 from flask import Flask, url_for, redirect, jsonify, request
 from flask_cors import CORS
+
 from apis.diabetes import *
+from apis.qcsi_calc import *
 from apis.rox_index import *
 from base.exceptions import *
 
@@ -51,10 +53,16 @@ def id_with_api(api):
         if request.values.get('id'):
             id = request.values.get('id')
             return jsonify(diabetes_predict(id, table['diabetes'])), 200
-    elif api == 'rox' or api == 'qcsi':
+
+    elif api == 'qcsi':
         if request.values.get('id'):
             id = request.values.get('id')
-            return jsonify(qcsi_rox_index(id, table['rox'])), 200
+            return jsonify(qcsi_calc(id, table['qcsi'])), 200
+
+    elif api == 'rox':
+        if request.values.get('id'):
+            id = request.values.get('id')
+            return jsonify(rox_index(id, table['rox'])), 200
     return "", 404
 
 
