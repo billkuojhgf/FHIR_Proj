@@ -98,16 +98,16 @@ def get_resource_datetime(dictionary, default_time):
                 return None
 
 
-def bmi(height_resource, weight_resource):
+def bmi(height, weight):
     # weight(unit: kilogram)/ height(unit: meter)/ height(unit: meter)
-    weight = {
-        'kg': weight_resource.valueQuantity.value,
-        'g': weight_resource.valueQuantity.value / 1000,
-        '[lb_av]': weight_resource.valueQuantity.value * 0.45359237
-    }.get(weight_resource.valueQuantity.unit, 0)
-    height = {
-        'cm': height_resource.valueQuantity.value / 100,
-        '[in_i]': height_resource.valueQuantity.value * 0.0254,
-    }.get(height_resource.valueQuantity.unit, 0)
+    # weight = {
+    #     'kg': weight_resource.valueQuantity.value,
+    #     'g': weight_resource.valueQuantity.value / 1000,
+    #     '[lb_av]': weight_resource.valueQuantity.value * 0.45359237
+    # }.get(weight_resource.valueQuantity.unit, 0)
+    # height = {
+    #     'cm': height_resource.valueQuantity.value / 100,
+    #     '[in_i]': height_resource.valueQuantity.value * 0.0254,
+    # }.get(height_resource.valueQuantity.unit, 0)
 
-    return weight / height / height
+    return float(weight) / float(height) / float(height)

@@ -24,13 +24,13 @@ def rox_index(id, table):
     result_dict['fio2']['value'] = estimate_fio2(data['fio2']['resource'])
 
     # calculate the score of qcsi_covid
-    result_dict['predict_value'] = rox_index_result(result_dict)
+    result_dict['predict_value'] = rox_model_result(result_dict)
     return result_dict
 
 
-def rox_index_result(dict):
+def rox_model_result(dict):
     # return integer or double
-    return '%.2f' % (dict['spo2']['value'] / dict['fio2']['value'] / dict['respiratory rate']['value'] * 100)
+    return '%.2f' % (int(dict['spo2']['value']) / int(dict['fio2']['value']) / int(dict['respiratory rate']['value']) * 100)
 
 
 def estimate_fio2(fio2_resources):

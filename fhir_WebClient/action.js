@@ -30,7 +30,7 @@ const app = new Vue({
                 result_json = response.data
                 //callback successed
                 if (result_json.hasOwnProperty("predict_value")) {
-                    app.predict_value = response.data.predict_value
+                    app.predict_value = result_json.predict_value
                     delete result_json["predict_value"]
                 }
                 app.results = result_json
@@ -44,9 +44,18 @@ const app = new Vue({
         },
         textchange: () => {
             console.log("textchange")
+            app.result_changes()
         },
         radioclicks: (key, value) => {
             app.results[key].value = value
+            app.result_changes()
+        },
+        result_changes: () => {
+            app.$http.post(`http://localhost:5000/${app.model}/change`, app.results, {}).then(response => {
+                app.predict_value = response.data.predict_value
+            }, () => {
+                console.log("Change failed")
+            })
         }
     }
 })

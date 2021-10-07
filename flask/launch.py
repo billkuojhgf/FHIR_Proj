@@ -48,7 +48,7 @@ def index():
 
 
 @app.route('/<api>', methods=['GET'])
-def id_with_api(api):
+def api_with_id(api):
     if api == 'diabetes':
         if request.values.get('id'):
             id = request.values.get('id')
@@ -64,6 +64,23 @@ def id_with_api(api):
             id = request.values.get('id')
             return jsonify(rox_index(id, table['rox'])), 200
     return "", 404
+
+
+@app.route('/<api>/change', methods=['POST'])
+# POST method will get the object body from frontend
+# POST method will only return predict value(double or integer)
+def api_with_post(api):
+    request_dict = request.get_json()
+    if api == 'diabetes':
+        predict_value = diabetes_model_result(request_dict)
+    elif api == 'qcsi':
+        predict_value = qcsi_model_result(request_dict)
+    elif api == 'rox':
+        predict_value = rox_model_result(request_dict)
+    else:
+        return "", 404
+
+    return {"predict_value": predict_value}, 200
 
 
 if __name__ == '__main__':

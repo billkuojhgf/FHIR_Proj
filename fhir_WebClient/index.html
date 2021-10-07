@@ -424,7 +424,11 @@
             name="date"
             v-model="results['spo2']['date']"
           />
-          <input type="text" v-model="results['spo2']['value']" />
+          <input
+            type="text"
+            v-model="results['spo2']['value']"
+            @change="textchange"
+          />
         </div>
         <div class="result" id="rox_fr">
           <h6>FiO₂</h6>
@@ -434,7 +438,11 @@
             name="date"
             v-model="results['fio2']['date']"
           />
-          <input type="text" v-model="results['fio2']['value']" />
+          <input
+            type="text"
+            v-model="results['fio2']['value']"
+            @change="textchange"
+          />
         </div>
         <div class="result" id="rox_rr">
           <h6>Respiratory rate</h6>
@@ -444,7 +452,11 @@
             name="date"
             v-model="results['respiratory rate']['date']"
           />
-          <input type="text" v-model="results['respiratory rate']['value']" />
+          <input
+            type="text"
+            v-model="results['respiratory rate']['value']"
+            @change="textchange"
+          />
         </div>
 
         <div id="evidence_result_rox">

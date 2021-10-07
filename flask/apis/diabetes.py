@@ -16,17 +16,16 @@ def diabetes_predict(id, table, default_time=None):
         data[key] = get_resources(id, table[key], default_time)
     data['age'] = get_age(id, default_time)
 
-    # get model result
-    result_proba = diabetes_model_result(data)
-
     # Put all the result and datas into result_dict and return as json format
     result_dict = dict()
-    result_dict['predict_value'] = result_proba
+
     for key in data:
         result_dict[key] = dict()
         result_dict[key]['date'] = get_resource_datetime(
             data[key], default_time)
         result_dict[key]['value'] = get_resource_value(data[key])
+    # get model result
+    result_dict['predict_value'] = diabetes_model_result(result_dict)
     return result_dict
 
 
@@ -38,8 +37,8 @@ def diabetes_model_result(data):
     x = list()
     # fixed variable: pregnancies=6, skinthickness=35, diabetespedigreefunction=0.627
     # controlled variable: glucose, diastolic blood pressure, insulin, height, weight, age
-    temp = [6, get_resource_value(data['glucose']), get_resource_value(data['diastolic blood pressure']), 35, get_resource_value(
-        data['insulin']), bmi(data['height']['resource'], data['weight']['resource']), 0.627, data['age']]
+    temp = [6, data['glucose']['value'], data['diastolic blood pressure']['value'], 35, data['insulin']
+            ['value'], bmi(data['height']['value'], data['weight']['value']), 0.627, data['age']['value']]
     loaded_model = joblib.load("./models/finalized_model.sav")
     x.append(temp)
     result = loaded_model.predict_proba(x)

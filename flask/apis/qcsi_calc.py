@@ -24,11 +24,11 @@ def qcsi_calc(id, table):
     # convert the value into qcsi's value format
     result_dict = convert_qcsi_value(result_dict)
     # calculate the score of qcsi_covid
-    result_dict['predict_value'] = qcsi_calc_result(result_dict)
+    result_dict['predict_value'] = qcsi_model_result(result_dict)
     return result_dict
 
 
-def qcsi_calc_result(dict):
+def qcsi_model_result(dict):
     result = 0
     for key in dict:
         result = result + dict[key]['value']
