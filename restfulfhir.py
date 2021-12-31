@@ -11,7 +11,7 @@ def create_resource(
 ):
     session = requests.session()
     for fname in os.listdir(path):
-        input_file = open(os.path.join(path, fname))
+        input_file = open(os.path.join(path, fname),encoding="utf-8")
         json_dict = json.load(input_file)
         id = None
 
@@ -29,16 +29,19 @@ def create_resource(
 
         headers = {"Content-Type": "application/fhir+json"}
 
-        response = session.put(
-            fhir_store_path, headers=headers, json=json_dict)
-        response.raise_for_status()
+        try:
+            response = session.put(
+                fhir_store_path, headers=headers, json=json_dict)
+            response.raise_for_status()
+        except:
+            continue
 
         resource = response.json()
         print("Created {} resource with ID {}".format(
             resources, resource["id"]))
 
 
-url = "http://localhost:5555/fhir"
+url = "http://localhost:8080/fhir"
 path = input("請輸入檔案夾路徑: ")
 create_resource(url, path)
 

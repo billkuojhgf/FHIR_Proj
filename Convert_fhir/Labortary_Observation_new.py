@@ -1,4 +1,3 @@
-import csv
 import threading
 from fhir.resources.observation import Observation, ObservationReferenceRange
 from fhir.resources.specimen import Specimen, SpecimenProcessing, SpecimenCollection
@@ -14,7 +13,7 @@ import os
 
 
 def observation(labortary_dataframe, count):
-    for index, row in labortary_dataframe.iterrows():
+    for row in labortary_dataframe.iterrows():
         # id = row.歸戶代號+'.'+row.檢驗編號+'.'+row.檢驗單一項目
         # status
         status = 'final'
@@ -98,7 +97,7 @@ def observation(labortary_dataframe, count):
 
 
 def specimen(labortary_dataframe, count):
-    for index, row in labortary_dataframe.iterrows():
+    for row in labortary_dataframe.iterrows():
         # id = labortary_row.歸戶代號.values[0]+'.'+labortary_row.檢驗編號.values[0]+'.'+labortary_row.檢體.values[0]
         id = "{filename}_Spec".format(filename=count)
         # status
