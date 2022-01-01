@@ -11,7 +11,7 @@ def create_resource(
 ):
     session = requests.session()
     for fname in os.listdir(path):
-        input_file = open(os.path.join(path, fname),encoding="utf-8")
+        input_file = open(os.path.join(path, fname), encoding="utf-8")
         json_dict = json.load(input_file)
         id = None
 

@@ -97,42 +97,9 @@ def observation(labortary_dataframe, count):
         count += 1
 
 
-def specimen(labortary_dataframe, count):
-    for row in labortary_dataframe.iterrows():
-        # id = labortary_row.歸戶代號.values[0]+'.'+labortary_row.檢驗編號.values[0]+'.'+labortary_row.檢體.values[0]
-        id = "{filename}_Spec".format(filename=count)
-        # status
-        status = 'available'
-        # subject
-        subject = Reference.construct()
-        subject.id = row.歸戶代號
-        subject.type = 'Patient'
-        subject.reference = 'Patient/{}'.format(subject.id)
-        # collection
-        collection = SpecimenCollection.construct()
-        collection.bodySite = CodeableConcept.construct(
-            code=row.檢體)
-        # collectedDateTime
-        try:
-            collectedDateTime = datetime.strptime(
-                str(int(row.採檢日期)) + str(int(row.採檢時間)).zfill(4), '%Y%m%d%H%M')
-        except:
-            collectedDateTime = None
-        # receivedTime
-        receivedTime = datetime.strptime(
-            str(int(row.收件日期)) + str(int(row.收件時間)).zfill(4), '%Y%m%d%H%M')
-        # Note
-        spec = Specimen.construct(id=id, status=status, subject=subject,
-                                  collection=collection, collectedDateTime=collectedDateTime, receivedTime=receivedTime)
-        with open(labortary_Specimen_OUTPUT + "{filename}.json".format(filename=id), 'w') as outEncounterfile:
-            outEncounterfile.write(Specimen.json(spec))
-        count += 1
-
-
 if __name__ == '__main__':
     from IsDirectory import isPATH
     isPATH(labortary_Observation_OUTPUT)
-    isPATH(labortary_Specimen_OUTPUT)
 
     count = 0
     print("資料處理中...")
@@ -144,10 +111,7 @@ if __name__ == '__main__':
             df = df_result.merge(df_index, how='inner', on=(
                 '歸戶代號', '檢驗編號', '檢體'), suffixes=('_result', '_index'))
             if df.empty is False:
-                t = threading.Thread(target=specimen, args=(df, count))
-                t.start()
                 observation(df, count)
-                t.join()
                 count += df.index.size
             print(csvname, '完成 !')
     print('Complete!')
