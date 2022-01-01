@@ -1,5 +1,4 @@
 import csv
-import json
 from flask import Flask, url_for, redirect, jsonify, request
 from flask_cors import CORS
 

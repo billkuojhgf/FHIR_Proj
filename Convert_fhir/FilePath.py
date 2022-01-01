@@ -31,3 +31,6 @@ emergency_Condition_OUTPUT = OUTPUT_PATH + "Emergency/Condition/"
 # 檢驗索引檔、檢驗結果歷史檔
 labortary_Observation_OUTPUT = OUTPUT_PATH + "Labortary/Observation/"
 labortary_Specimen_OUTPUT = OUTPUT_PATH + "Labortary/Specimen/"
+
+# 生命徵象紀錄檔
+#

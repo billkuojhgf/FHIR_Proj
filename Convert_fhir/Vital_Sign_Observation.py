@@ -1,6 +1,6 @@
 import threading
 from fhir.resources.observation import Observation, ObservationReferenceRange
-from fhir.resources.specimen import Specimen, SpecimenProcessing, SpecimenCollection
+from fhir.resources.specimen import Specimen, SpecimenCollection
 from fhir.resources.period import Period
 from fhir.resources.quantity import Quantity
 from fhir.resources.codeableconcept import CodeableConcept
@@ -16,7 +16,7 @@ def observation(labortary_dataframe, count):
     for row in labortary_dataframe.iterrows():
         # id = row.歸戶代號+'.'+row.檢驗編號+'.'+row.檢驗單一項目
         # status
-        status = 'final'
+        status = 'perliminary'
         # valueQuantity or valueString
         valueQuantity = None
         valueString = None
@@ -34,7 +34,8 @@ def observation(labortary_dataframe, count):
         code = CodeableConcept.construct()
         code_list = list()
         coding_cgmh = Coding.construct()
-        coding_cgmh.code = row.檢驗單一項目
+        coding_cgmh.display = row.項目名稱
+        coding_cgmh.code = row.項目代號
         coding_cgmh.system = 'https://www.cgmh.org.tw'
         code_list.append(coding_cgmh)
         code.coding = code_list

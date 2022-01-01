@@ -18,7 +18,9 @@ with open(patient_path, newline='') as csvfile:
 
         patmanagingOrganization = Reference.construct()
         patmanagingOrganization.id = row["院區"]
-        patmanagingOrganization.reference = "Organization/{}".format(row["院區"])
+        # Hapi的資料ID不能只放數字，加一個h代表hospital
+        patmanagingOrganization.reference = "Organization/h{}".format(
+            row["院區"])
         patmanagingOrganization.type = "Organization"
 
         if row["性別"] == "M":
