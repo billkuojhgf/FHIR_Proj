@@ -2,7 +2,8 @@ import datetime
 from base.searchsets import *
 
 
-def rox_index(id, table):
+# ROX Index Patient's ID api
+def rox_index_calc_with_patient_id(id, table, dataAliveTime):
     # default_time變數是為模型訓練用, 這裡不需要這種東西
     default_time = datetime.datetime.now()
 
@@ -11,7 +12,8 @@ def rox_index(id, table):
     data = dict()
     for key in table:
         data[key] = dict()
-        data[key] = get_resources(id, table[key], default_time)
+        data[key] = get_resources(
+            id, table[key], default_time, dataAliveTime=dataAliveTime)
 
     # Put all the result and datas into result_dict and return as json format
     result_dict = dict()
@@ -24,6 +26,28 @@ def rox_index(id, table):
     result_dict['fio2']['value'] = estimate_fio2(data['fio2']['resource'])
 
     # calculate the score of qcsi_covid
+    result_dict['predict_value'] = rox_model_result(result_dict)
+    return result_dict
+
+
+def rox_index_calc_with_score(dict):
+    """
+        dict: {
+            "respiratory rate": {
+                "date": (YYYY-MM-DD)T(HH:MM),
+                "value": 25
+            },
+            "fio2": {
+                "date": (YYYY-MM-DD)T(HH:MM),
+                "value": 60
+            },
+            "spo2": {
+                "date": (YYYY-MM-DD)T(HH:MM),
+                "value": 25
+            }
+        }
+    """
+    result_dict = dict
     result_dict['predict_value'] = rox_model_result(result_dict)
     return result_dict
 

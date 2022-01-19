@@ -34,7 +34,7 @@ def create_resource(
                 fhir_store_path, headers=headers, json=json_dict)
             response.raise_for_status()
         except:
-            continue
+            print(response.raise_for_status(), response.reason)
 
         resource = response.json()
         print("Created {} resource with ID {}".format(

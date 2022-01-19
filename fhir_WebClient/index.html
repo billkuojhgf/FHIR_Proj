@@ -68,6 +68,12 @@
           autocomplete="off"
         />
         <div class="result">
+          <div v-if="model == 'qcsi' || model == 'rox'">
+            <label for="hourTime" style="font-size: 15px"
+              >資料距離現在小時:</label
+            >
+            <input id="hourTime" type="number" v-model.lazy="param_hour" />
+          </div>
           <input type="button" value="Search it!" @click="searchQuery" />
         </div>
       </div>
@@ -144,7 +150,7 @@
           {{ key }}, {{item.date}}, {{ item.value }}
         </label> -->
       </div>
-      <div id="qcsi_model" class="form-result" v-if="model=='qcsi'&hasData">
+      <div id="qcsi_model" class="form-result" v-if="model=='qcsi'&isClick">
         <div class="result" id="qCSI_rr">
           <h6>Respiratory Rate</h6>
           <input
@@ -415,7 +421,7 @@
         </div>
       </div>
 
-      <div id="rox_model" class="form-result" v-if="model=='rox'&hasData">
+      <div id="rox_model" class="form-result" v-if="model=='rox'&isClick">
         <div class="result" id="rox_pulse">
           <h6>SpO₂</h6>
           <input
@@ -426,7 +432,7 @@
           />
           <input
             type="text"
-            v-model="results['spo2']['value']"
+            v-model.lazy="results['spo2']['value']"
             @change="textchange"
           />
         </div>

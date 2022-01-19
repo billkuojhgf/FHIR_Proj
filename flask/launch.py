@@ -13,6 +13,14 @@ CORS(app)
 # Map the csv into dictionary
 table_position = "./table/table_example.csv"
 table = {}
+dataAliveTime = {
+    'years': 0,
+    'months': 0,
+    'days': 0,
+    'hours': 0,
+    'minutes': 0,
+    'seconds': 0,
+}
 with open(table_position, newline='') as table_example:
     rows = csv.DictReader(table_example)
     for row in rows:
@@ -51,17 +59,26 @@ def api_with_id(api):
     if api == 'diabetes':
         if request.values.get('id'):
             id = request.values.get('id')
-            return jsonify(diabetes_predict(id, table['diabetes'])), 200
+            yearsAliveTime = request.values.get(
+                'yearAliveTime') if request.values.get('yearAliveTime') == True else 5
+            dataAliveTime['years'] = yearsAliveTime
+            return jsonify(diabetes_predict(id, table['diabetes'], dataAliveTime)), 200
 
     elif api == 'qcsi':
         if request.values.get('id'):
             id = request.values.get('id')
-            return jsonify(qcsi_calc(id, table['qcsi'])), 200
+            hour_alive = request.values.get('hourAliveTime') if request.values.get(
+                'hourAliveTime') == True else 24
+            dataAliveTime['hours'] = hour_alive
+            return jsonify(qcsi_calc_with_patient_id(id, table['qcsi'], dataAliveTime)), 200
 
     elif api == 'rox':
         if request.values.get('id'):
             id = request.values.get('id')
-            return jsonify(rox_index(id, table['rox'])), 200
+            hour_alive = request.values.get('hourAliveTime') if request.values.get(
+                'hourAliveTime') == True else 24
+            dataAliveTime['hours'] = hour_alive
+            return jsonify(rox_index_calc_with_patient_id(id, table['rox'], dataAliveTime)), 200
     return "", 404
 
 
@@ -73,9 +90,9 @@ def api_with_post(api):
     if api == 'diabetes':
         predict_value = diabetes_model_result(request_dict)
     elif api == 'qcsi':
-        predict_value = qcsi_model_result(request_dict)
+        predict_value = qcsi_calc_with_score(request_dict)
     elif api == 'rox':
-        predict_value = rox_model_result(request_dict)
+        predict_value = rox_index_calc_with_score(request_dict)
     else:
         return "", 404
 

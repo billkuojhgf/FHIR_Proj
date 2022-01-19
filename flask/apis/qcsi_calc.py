@@ -1,17 +1,20 @@
 import datetime
+from unittest import result
 from base.searchsets import *
 
 
-def qcsi_calc(id, table):
+# qCSI Patient's id api
+def qcsi_calc_with_patient_id(id, table, dataAliveTime):
     # default_time變數是為模型訓練用, 這裡不需要這種東西
     default_time = datetime.datetime.now()
 
-    # prepare all the data to search
+    # prepare all the patient's data to search
     # put all the resource we need in data
     data = dict()
     for key in table:
         data[key] = dict()
-        data[key] = get_resources(id, table[key], default_time)
+        data[key] = get_resources(
+            id, table[key], default_time, dataAliveTime=dataAliveTime)
 
     # Put all datas into result_dict
     result_dict = dict()
@@ -28,11 +31,19 @@ def qcsi_calc(id, table):
     return result_dict
 
 
+# qCSI score api
+def qcsi_calc_with_score(dict):
+    result_dict = dict
+    result_dict = convert_qcsi_value(result_dict)
+    result_dict['predict_value'] = qcsi_model_result(result_dict)
+    return result_dict
+
+
 def qcsi_model_result(dict):
     result = 0
     for key in dict:
-        result = result + dict[key]['value']
-    # return integer
+        result += dict[key]['value']
+    # type(result) === int
     return result
 
 

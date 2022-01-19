@@ -3,8 +3,17 @@ import datetime
 
 from base.searchsets import *
 
+dataAliveTime = {
+    'years': 5,
+    'months': 0,
+    'days': 0,
+    'hours': 0,
+    'minutes': 0,
+    'seconds': 0,
+}
 
-def diabetes_predict(id, table, default_time=None):
+
+def diabetes_predict(id, table, dataAliveTime=dataAliveTime, default_time=None,):
     # default_time變數是為模型訓練用(type=date or datetime)，數值放入patient得病的時間，None表示使用現在時間`
     if default_time == None:
         default_time = datetime.datetime.now()
