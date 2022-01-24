@@ -1,0 +1,3 @@
+FROM python:3
+
+ADD ketos_environment_api/ /mlService_dataPreprocessing

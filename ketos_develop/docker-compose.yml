@@ -1,0 +1,145 @@
+version: '2.0'
+
+services:
+  gui:
+    container_name: ketos_gui
+    image: ketos_gui
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend
+  brain:
+    container_name: ketos_brain
+    image: python:3
+    restart: unless-stopped
+    depends_on:
+      - brain_db
+      - preproc
+    ports:
+      - "5000:5000"
+    networks:
+      - frontend
+      - backend
+      - environment
+      - ketosfhir
+    links:
+      - brain_db
+    volumes:
+      - ./ketos_brain_api/src:/ketos_brain_api
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /Users/juliangruendner/phd/code/ketos_develop/ketos_data_dir:/ketos
+    env_file:
+      - config_brain.env
+      - config_brain_db.env
+    command: bash -c "cd /ketos_brain_api && chmod +x startup.dev.sh && ./startup.dev.sh"
+
+  brain_db:
+    container_name: ketos_brain_db
+    restart: unless-stopped
+    image: postgres:latest
+    restart: unless-stopped
+    env_file:
+      - config_brain_db.env
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./pg_data_brain:/var/lib/postgresql/data
+    networks:
+      - backend
+  
+  mongodb:
+    container_name: ketos_preproc_db
+    image: mongo:latest
+    restart: unless-stopped
+    networks:
+      - backend
+    expose:
+      - "27017" # process
+      - "28017" # http
+    ports:
+      - "127.0.0.1:27017:27017"
+      - "127.0.0.1:28017:28017"
+
+  preproc:
+    container_name: ketos_preproc
+    env_file:
+      - config_preproc.env
+    image: python:3
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    ports:
+      - "5002:5000"
+    networks:
+      - backend
+      - environment
+      - ketosfhir
+    volumes:
+      - ./ketos_preprocessing:/ketos_preprocessing
+    command: bash -c "cd /ketos_preprocessing/src && chmod +x startup.dev.sh && ./startup.dev.sh"
+  #
+  #anno_db:
+  #  container_name: ketos_anno_db
+  #  restart: unless-stopped
+  #  image: postgres:latest
+  #  restart: unless-stopped
+  #  env_file:
+  #    - config_anno_db.env
+  #  ports:
+  #    - "5434:5432"
+  #  volumes:
+  #    - ./pg_data_anno:/var/lib/postgresql/data
+  #  networks:
+  #    - backend
+  #
+  #anno_api:
+  #  container_name: ketos_anno
+  #  image: python:3
+  #  restart: unless-stopped
+  #  depends_on:
+  #    - anno_db
+  #  ports:
+  #    - "5005:5000"
+  #  networks:
+  #    - backend
+  #  links:
+  #    - anno_db
+  #  volumes:
+  #    - ./ketos_annotation/src:/ketos_annotation
+  #  env_file:
+  #    - config_anno_db.env
+  #  command: bash -c "cd /ketos_annotation && chmod +x startup.dev.sh && ./startup.dev.sh"
+
+  fhir:
+    container_name: ketos_fhir
+    restart: unless-stopped
+    image: docker.miracum.org/ketos/ketos_fhir:v0.2.0
+    restart: unless-stopped
+    env_file:
+      - config_ketos_fhir.env
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+  
+  fhirdb:
+    container_name: ketos_fhir_db
+    restart: unless-stopped
+    image: postgres:latest
+    restart: unless-stopped
+    env_file:
+      - config_ketos_fhir.env
+    ports:
+      - "5434:5432"
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+  environment:
+  ketosfhir:
+      external:
+        name: ketosfhir
