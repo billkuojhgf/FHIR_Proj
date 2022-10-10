@@ -1,0 +1,46 @@
+﻿age,年齡
+gender,性別
+fever,發燒
+tachy,心跳過速
+tpnea,呼吸急促
+hypo,低血壓
+wound,傷口
+sea,接觸 海水 與海鮮
+animal,動物 接觸與咬傷
+farm ,農業用水 與髒水接觸
+rash,皮疹 與紅斑
+warm,皮膚溫熱
+Hbullae,出血性大皰
+anes,皮膚麻醉
+necro,皮膚壞死 伴暗色
+pain,疼痛 與壓痛
+Swell,腫脹
+Sbullae,液漿性大皰
+crep,捻髮 音
+dm,糖尿病 
+hepa,慢性肝炎
+ckd,慢性腎臟病
+cancer,癌症
+alco,酗酒 
+htn,高血壓
+lc,肝硬化
+ai,腎上腺機能不全 
+paod,周邊動脈阻塞疾病
+wbc,白血球
+plt,血小板
+sodium,鈉
+sugar,血糖
+crp,C反應蛋白
+seg,多形核白血球
+hb,血紅素
+cr,血清 肌酸酐
+k,鉀
+alt,丙氨 酸轉胺酵素
+band,帶狀 白血球
+season_F,秋天
+season_H,夏天
+season_S,春天
+season_W,冬天
+site_D,上下肢
+site_L,下肢
+site_U,上肢
